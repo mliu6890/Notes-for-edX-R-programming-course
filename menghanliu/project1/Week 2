@@ -1,0 +1,45 @@
+# Part I
+data <- read.csv("femaleMiceWeights.csv")
+# Row 1 thru 12 have body weight records for Control mice; row 13 thru 24 for mice fed with high fat diet.
+diff <- mean(data[13:24,2])-mean(data[1:12,2])
+diff
+sum(data[1:12,2]-data[13:24,2] >0) # Question 1.1 Indicate the number of control mice weigh more than high fat mice
+sum(data[1:12,2]-mean(data[13:24,2]) >0) # Q1.2 Indicate the number of control mice weigh more than the mean of high fat mice.
+#Demo: split the weights by diet
+s <- split(data[,2],data[,1])
+highfat<- s$hf
+highfat
+sample(highfat, 6) #Generate a random sample of size 6 from the weights of highfat diet mice
+
+sum(highfat > 30)/sum(complete.cases(highfat)) #Q1.3 The proportion of highfat diet mice over 30 
+
+population <- read.csv("femaleControlsPopulation.csv")
+popu <- population[,1]
+null <- replicate(10000, mean(sample(popu, 12))-mean(sample(popu, 12))) #Constructing null distribution
+hist(null)
+mean(null>diff) #Q 3.1 Calculating one-tail probability of seeing as big a difference as we observed in diff
+
+# Part II Q 1.1
+library(devtools)
+install_github("jennybc/gapminder")
+library(gapminder)
+data(gapminder)# Load the dataset "gapminder"
+head(gapminder)
+dat <- gapminder[gapminder$year < 1953, ] #subsetting countries in year 1952
+mean(dat$lifeExp <= 40)#Calculating the proportion of countries with life expectancy less than or equal to 40 in the subset
+# Q 1.2
+mean(dat$lifeExp <= 60)-mean(dat$lifeExp <=40) # Between 40 and 60 
+
+# Q 2.1
+year <- gapminder[gapminder$year <1953, ] #Subsetting countries in year 1952
+tab <- year$pop #Creating a vector of population size from the subset
+hist(tab)
+hist(log10(tab)) #Draw a histogram of the log10 of population size of countries in 1952
+sd(log10(tab)) #Calculate the std deviation of the log10 distribution of population
+
+# Q 2.2
+x <- log10(tab)
+qqnorm(x)
+z <- (log10(tab)-mean(log10(tab)))/sd(log10(tab))
+qqnorm(z)
+tail(sort(z),1) #Calculate the z-score of the country with the largest population size
