@@ -1,0 +1,59 @@
+#Part I
+dat <- read.table("babies.txt", header=TRUE)
+head(dat)
+bwt.nonsmoke <- dat[dat$smoke==0, 1] #Subsetting the birth weight of babies from nonsmokers
+bwt.smoke <- dat[dat$smoke==1, 1] #Subsetting the birth weight of babies from smokers
+dat.ns <- bwt.nonsmoke[1:30] #First 30 weights from nonsmokers
+dat.s <- bwt.smoke[1:30] #First 30 weights from smokers
+t.test (dat.ns, dat.s) # Question 1.1: Performing t test between the two.
+
+#Part II
+testgen <-function(N){
+  bwt.ns <- sample(bwt.nonsmoke,N)#Taking a random sample from each group
+  bwt.s <-sample(bwt.smoke, N)
+  return(t.test(bwt.ns, bwt.s)$conf.int)#Reporting confidence interval of the difference
+}
+ci <- replicate(1000,testgen(30))#Sample size of 30, 1000 simulations
+mean(ci[2,])-mean(ci[1,])#Q 1.1: Average length of confidence interval
+
+B <- 1000
+alpha <- 0.01 #Significance level
+rej <- sapply(1:B, function(i){
+  bwt.ns <- sample(bwt.nonsmoke, 15) #Taking a random sample of N=15 from each group
+  bwt.s <- sample(bwt.smoke, 15)
+  t.test(bwt.ns, bwt.s)$p.value < alpha #Logical statement
+})
+mean(rej) #Q 3.1, 3.2, 3.3: Calculating the power at alpha=0.01
+
+d <- read.csv("assoctest.csv")
+tab <- table(d) #Putting data into a table
+tab
+chisq.test(tab) #Q 2.1 Chi-square test
+fisher.test(tab)$p.value #Q 2.2 Fisher's exact test
+
+#Part III
+#Monte Carlo simulation
+babies <- read.table("babies.txt", header=TRUE)
+bwt.nonsmoke <- babies$bwt[babies$smoke==0]
+pop.var <- var(bwt.nonsmoke)
+ttestgen <- function(n){
+  nonsmokers <- sample(babies$bwt[babies$smoke==0],n)
+  return(var(nonsmokers))
+}
+test<- replicate(1000, ttestgen(50)) #Sample size of 50, 1000 simultions
+hist(test)
+abline(v=pop.var, col="red")
+mean(test > 1.5*pop.var) #Q 1.1: The frquency sample variance is greater than 1.5 times the population variance
+
+set.seed(0)
+N<- 50
+smokers <- sample(babies$bwt[babies$smoke==0], N)
+nonsmokers <- sample(babies$bwt[babies$smoke==0],N)
+obs<-median(smokers)-median(nonsmokers)
+avgdiff <- replicate(1000,{
+  all<- sample(c(smokers, nonsmokers))
+  smokerstar <-all[1:N]
+  nonsmokerstar <- all[(N+1):(2*N)]
+  return(median(smokerstar)-median(nonsmokerstar))
+})
+mean(abs(avgdiff) > abs(obs)) #Q 2.1: Permutation test
