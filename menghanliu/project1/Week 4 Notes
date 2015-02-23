@@ -1,0 +1,36 @@
+load("skew (1).RData")
+par(mfrow=c(3,3))#Graph showing 3*3 at a time
+for(i in 1:9){
+  qqnorm(dat[,i]) #Plotting a qq-plot for each column in dat
+}
+hist(dat[,4])
+hist(dat[,9])
+
+par(mfrow=c(1,1))
+head(InsectSprays)
+boxplot(split(InsectSprays$count,InsectSprays$spray)) #Drawing a boxplot between the type of sprays and the number of treated insects
+boxplot(InsectSprays$count ~ InsectSprays$spray) # Alternative method
+
+install.packages("UsingR")
+library(UsingR)
+data(father.son)
+head(father.son)
+x <-father.son$fheight
+y <-father.son$sheight
+plot(scale(x),scale(y))
+abline(h=0,v=0)
+cor(x,y) #Finding the correlation (i.e. the average of scaled x times scaled y value)
+
+data(nym.2002)
+head(nym.2002)
+time <- sort(nym.2002$time)
+head(time)
+min(time)/median(time)
+max(time)/median(time)
+
+install.packages("dplyr")#Using data manipulating tool dplyr and pipe command %>% to create a variable REM_por, group by taxonomic order, find the median of REM_por, arrange it in an ascending order, and report the lowest value
+library(dplyr)
+msleep <- read.csv("msleep_ggplot2.csv")
+head(msleep)
+msleep %>% mutate(REM_por = sleep_rem / sleep_total) %>% group_by(order) %>%
+  summarise(m_sleep = median(REM_por)) %>% arrange(m_sleep) %>% head
