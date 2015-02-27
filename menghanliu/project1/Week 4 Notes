@@ -34,3 +34,38 @@ msleep <- read.csv("msleep_ggplot2.csv")
 head(msleep)
 msleep %>% mutate(REM_por = sleep_rem / sleep_total) %>% group_by(order) %>%
   summarise(m_sleep = median(REM_por)) %>% arrange(m_sleep) %>% head
+
+data(ChickWeight)
+plot(ChickWeight$Time, ChickWeight$weight, col=ChickWeight$Diet)
+head(ChickWeight)
+#Change dataset from a "long"shape to a "wide" shape
+chick <- reshape(ChickWeight, idvar=c("Chick","Diet"), timevar="Time", direction="wide")
+head(chick)
+chick <- na.omit(chick) #Identify and remove missing observations
+weight4new <- c(chick$weight.4, 3000) #Adding an outlier of 3000 to chick weight on day 4
+mean(weight4new)/mean(chick$weight.4)#Studying the effect of the outlier on sample mean
+median(weight4new)/median(chick$weight.4)#Studying its effect on median
+sd(weight4new)/sd(chick$weight.4)#Studying its effect on standard deviation
+mad(weight4new)/mad(chick$weight.4)#Median Absolute Deviation: a robust estimation of std deviatoin
+
+plot(chick$weight.4, chick$weight.21, col=chick$Chick)
+weight21new <- c(chick$weight.21, 3000)
+cor(weight4new, weight21new)/cor(chick$weight.4, chick$weight.21) #Pearson correltion
+cor(weight4new, weight21new, method="spearman")/cor(chick$weight.4, chick$weight.21, method="spearman")
+#Spearman correlation is less changed by the addition of the outlier because it depends on the rank of observation
+
+x <- chick$weight.4[chick$Diet==1]
+y <- chick$weight.4[chick$Diet==4]
+xnew <- c(x, 200)# Adding an outlier of 200(gram) to chicken weight on day 4 from diet 1
+t.test(xnew, y)$p.value #=0.938
+wilcox.test(xnew,y) #p.value=0.00098, more robust to the outlier
+
+par(mfrow=c(1,3))
+boxplot(x,y)
+boxplot(x,y+10)# With additional difference of 10g
+boxplot(x,y+100)# With additional difference of 100g
+t.test(x,y+10)$statistic-t.test(x,y+100)$statistic #t statistic change as difference grows.
+# Wilcoxon test statistic for the following two are the same, regardless of how large the difference grows.
+wilcox.test(x,y+10) 
+wilcox.test(x,y+100)
+#Wilcoxon test proves less powerful than t-test in certain contexts.
