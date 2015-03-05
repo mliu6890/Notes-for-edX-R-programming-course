@@ -1,0 +1,23 @@
+cdc <- read.csv("cdc.csv")
+dim(cdc) #Shows number of cases and variables in the dataset
+names(cdc) #Reveals names of variables
+summary(cdc) #Shows summary of data for each variable
+
+#table() counts the number of times each kind of response was given for a categorical variable
+table(cdc$genhlth)/20000 #Calculates the relative frequency distribution of genhlth
+#Alternative method: subsetting observations with excellent health condition, then calculate its portion in the sample
+excel <- cdc[cdc$genhlth=='excellent',1]
+length(excel)/20000
+
+gender_smoke <- table(cdc$gender, cdc$smoke100)#table command tabulates the two variables
+gender_smoke
+mosaicplot(gender_smoke)# Creates a mosaic plot of this table
+
+#subset() command extracts the data that satisfy some conditions. & = and, | = or
+age_smoke <- subset(cdc, cdc$age < 23 & cdc$smoke100==1) #Extracts respondents under age of 23 and have smoked at least 100 cigaretts in their lifetime
+dim(age_smoke)#Shows the number of observations of such respondents
+
+bmi <- (cdc$weight / cdc$height^2) * 703
+boxplot(bmi ~ cdc$genhlth)#Compares bmi statistic across several categories in genhlth
+
+plot (cdc$weight, cdc$wtdesire)#Draw a scatterplot of weight versus desired weight and infer the relationship between the two
