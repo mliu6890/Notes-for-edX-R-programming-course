@@ -1,0 +1,16 @@
+load(url("http://www.openintro.org/stat/data/ames.RData"))
+area <- ames$Gr.Liv.Area
+samp <- sample(area,60)
+sample_mean <- mean(samp)
+
+sample_means_small <- rep(NA, 100) #Initialize a vector of NAs that hold spaces for values we fill later with actual sample means. 
+sample_sd <- rep(NA,100) #Initalize another vector for std deviation
+for(i in 1:100){ 
+  sample1 <- sample(area, 50) #The set of code is run for each value of i
+  sample_means_small[i] <- mean(sample1)
+  sample_sd[i] <- sd(sample1)
+}
+lower <- sample_means_small - 2.58*sample_sd/sqrt(50)
+upper <- sample_means_small +2.58*sample_sd/sqrt(50)
+plot_ci(lower, upper, sample_mean)
+c(lower[1],upper[1])
